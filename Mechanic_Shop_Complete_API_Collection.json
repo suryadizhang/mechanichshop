@@ -21,7 +21,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Jane Doe\",\n    \"email\": \"jane.doe@email.com\",\n    \"phone\": \"555-0123\",\n    \"address\": \"123 Main St, City, State\"\n}"
+							"raw": "{\n    \"name\": \"Jane Doe\",\n    \"email\": \"jane.doe@email.com\",\n    \"phone\": \"555-012-1233\",\n    \"address\": \"123 Main St, City, State\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/customers/",
@@ -48,7 +48,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Bob Smith\",\n    \"email\": \"bob.smith@email.com\",\n    \"phone\": \"555-0456\",\n    \"address\": \"456 Oak Ave, City, State\"\n}"
+							"raw": "{\n    \"name\": \"Bob Smith\",\n    \"email\": \"bob.smith@email.com\",\n    \"phone\": \"555-045-6789\",\n    \"address\": \"456 Oak Ave, City, State\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/customers/",
@@ -111,7 +111,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Jane Doe Updated\",\n    \"phone\": \"555-9999\",\n    \"address\": \"789 New Address St\"\n}"
+							"raw": "{\n    \"name\": \"Jane Doe Updated\",\n    \"phone\": \"555-999-9999\",\n    \"address\": \"789 New Address St\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/customers/1",
@@ -162,7 +162,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"John Smith\",\n    \"email\": \"john@mechanicshop.com\",\n    \"phone\": \"555-1001\",\n    \"specialty\": \"Engine Repair\",\n    \"hourly_rate\": 75.0,\n    \"years_experience\": 8,\n    \"is_available\": true\n}"
+							"raw": "{\n    \"name\": \"John Smith\",\n    \"email\": \"john@mechanicshop.com\",\n    \"phone\": \"555-100-3541\",\n    \"specialty\": \"Engine Repair\",\n    \"hourly_rate\": 75.0,\n    \"years_experience\": 8,\n    \"is_available\": true\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/mechanics/",
@@ -189,7 +189,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Sarah Johnson\",\n    \"email\": \"sarah@mechanicshop.com\",\n    \"phone\": \"555-1002\",\n    \"specialty\": \"Transmission\",\n    \"hourly_rate\": 80.0,\n    \"years_experience\": 12,\n    \"is_available\": true\n}"
+							"raw": "{\n    \"name\": \"Sarah Johnson\",\n    \"email\": \"sarah@mechanicshop.com\",\n    \"phone\": \"555-100-3456\",\n    \"specialty\": \"Transmission\",\n    \"hourly_rate\": 80.0,\n    \"years_experience\": 12,\n    \"is_available\": true\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/mechanics/",
@@ -216,7 +216,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Mike Davis\",\n    \"email\": \"mike@mechanicshop.com\",\n    \"phone\": \"555-1003\",\n    \"specialty\": \"Electrical Systems\",\n    \"hourly_rate\": 85.0,\n    \"years_experience\": 15,\n    \"is_available\": true\n}"
+							"raw": "{\n    \"name\": \"Mike Davis\",\n    \"email\": \"mike@mechanicshop.com\",\n    \"phone\": \"555-100-3456\",\n    \"specialty\": \"Electrical Systems\",\n    \"hourly_rate\": 85.0,\n    \"years_experience\": 15,\n    \"is_available\": true\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/mechanics/",
