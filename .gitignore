@@ -142,3 +142,101 @@ instance/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Project-specific files
+# Testing and validation scripts (not part of assignment)
+*validation*.py
+*test_*.py
+test_*.py
+*_test.py
+*TEST*.py
+
+# Documentation and reports (not part of assignment)
+*.md
+!README.md
+REPORT*.md
+*REPORT*.md
+*_report.*
+*validation_report.*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Flask-specific
+instance/
+.webassets-cache
+*.pyc
+migrations/versions/*.py
+!migrations/versions/__init__.py
+
+# Database-specific for this project
+mechanicshop.db
+*.db-journal
+
+# IDE and editor files
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Postman collection backups
+*_backup.json
+Mechanic_Shop_API_Test_*.json
+!Mechanic_Shop_API_Test.json
+
+# Python virtual environments (all variations)
+venv*/
+env*/
+.venv*/
+.env*/
+ENV*/
+env.bak/
+venv.bak/
+
+# Cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Pytest
+.pytest_cache/
+.cache
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Local configuration overrides
+config_local.py
+local_config.py
+settings_local.py
+
+# Runtime logs
+flask_app.log
+api.log
+app.log
+error.log
+
+# Session files
+flask_session/
+sessions/
+
+# Upload directories (if any)
+uploads/
+static/uploads/

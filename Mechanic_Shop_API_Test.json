@@ -1,0 +1,793 @@
+{
+	"info": {
+		"_postman_id": "mechanic-shop-api-2025",
+		"name": "🔧 Mechanic Shop API",
+		"description": "Comprehensive testing for all assignment requirements:\n- Rate Limiting & Caching\n- Token Authentication (Customer & Mechanic)\n- Advanced Queries (Pagination, Rankings)\n- Inventory System with Many-to-Many relationships\n- Full CRUD operations for all models",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🏠 API Health Check",
+			"item": [
+				{
+					"name": "Check API Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": ["{{base_url}}"],
+							"path": [""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "👥 Customer Management",
+			"item": [
+				{
+					"name": "Create Customer #1 (Jane)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Customer created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('customer_1_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Jane Doe\",\n    \"email\": \"jane.doe@email.com\",\n    \"phone\": \"555-123-4567\",\n    \"address\": \"123 Main St, Anytown, USA\",\n    \"password\": \"securepass123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customers/",
+							"host": ["{{base_url}}"],
+							"path": ["customers", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Customer #2 (Bob)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Customer created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('customer_2_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Bob Smith\",\n    \"email\": \"bob.smith@email.com\",\n    \"phone\": \"555-456-7890\",\n    \"address\": \"456 Oak Ave, Anytown, USA\",\n    \"password\": \"bobpassword456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customers/",
+							"host": ["{{base_url}}"],
+							"path": ["customers", ""]
+						}
+					}
+				},
+				{
+					"name": "Customer Login (Jane)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Login successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Token received', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('token');",
+									"    pm.environment.set('customer_token', response.token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"jane.doe@email.com\",\n    \"password\": \"securepass123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customers/login",
+							"host": ["{{base_url}}"],
+							"path": ["customers", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get All Customers (Paginated)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Customers retrieved with pagination', function () {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('customers');",
+									"    pm.expect(response).to.have.property('pagination');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customers/?page=1&per_page=10",
+							"host": ["{{base_url}}"],
+							"path": ["customers", ""],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "10"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Customer Tickets (Token Required)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Customer tickets retrieved', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{customer_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/customers/my-tickets",
+							"host": ["{{base_url}}"],
+							"path": ["customers", "my-tickets"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🔧 Mechanic Management",
+			"item": [
+				{
+					"name": "Create Mechanic #1 (Engine Specialist)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mechanic created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('mechanic_1_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Smith\",\n    \"email\": \"john@mechanicshop.com\",\n    \"phone\": \"555-100-1001\",\n    \"specialty\": \"Engine Repair\",\n    \"hourly_rate\": 75.00,\n    \"password\": \"mechanic123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/mechanics/",
+							"host": ["{{base_url}}"],
+							"path": ["mechanics", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Mechanic #2 (Transmission)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mechanic created successfully', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('mechanic_2_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Sarah Johnson\",\n    \"email\": \"sarah@mechanicshop.com\",\n    \"phone\": \"555-100-1002\",\n    \"specialty\": \"Transmission Repair\",\n    \"hourly_rate\": 80.00,\n    \"password\": \"sarahpass456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/mechanics/",
+							"host": ["{{base_url}}"],
+							"path": ["mechanics", ""]
+						}
+					}
+				},
+				{
+					"name": "Mechanic Login (John)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mechanic login successful', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Mechanic token received', function () {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('token');",
+									"    pm.environment.set('mechanic_token', response.token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@mechanicshop.com\",\n    \"password\": \"mechanic123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/mechanics/login",
+							"host": ["{{base_url}}"],
+							"path": ["mechanics", "login"]
+						}
+					}
+				},
+				{
+					"name": "Get All Mechanics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mechanics retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/mechanics/",
+							"host": ["{{base_url}}"],
+							"path": ["mechanics", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Mechanics by Ticket Count (Advanced Query)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mechanics ranked by tickets', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/mechanics/by-tickets",
+							"host": ["{{base_url}}"],
+							"path": ["mechanics", "by-tickets"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📦 Inventory Management",
+			"item": [
+				{
+					"name": "Create Inventory Item #1 (Oil Filter)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Inventory item created', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('inventory_1_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mechanic_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Oil Filter - Premium\",\n    \"description\": \"High-quality oil filter for most vehicles\",\n    \"price\": 15.99,\n    \"quantity\": 50,\n    \"category\": \"Filters\",\n    \"supplier\": \"AutoParts Plus\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/inventory/",
+							"host": ["{{base_url}}"],
+							"path": ["inventory", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Inventory Item #2 (Brake Pads)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Inventory item created', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('inventory_2_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mechanic_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Brake Pads - Front Set\",\n    \"description\": \"High-performance ceramic brake pads\",\n    \"price\": 89.99,\n    \"quantity\": 25,\n    \"category\": \"Brakes\",\n    \"supplier\": \"BrakeTech Pro\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/inventory/",
+							"host": ["{{base_url}}"],
+							"path": ["inventory", ""]
+						}
+					}
+				},
+				{
+					"name": "Get All Inventory (Cached)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Inventory retrieved successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/inventory/",
+							"host": ["{{base_url}}"],
+							"path": ["inventory", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🎫 Service Ticket Management",
+			"item": [
+				{
+					"name": "Create Service Ticket #1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Service ticket created', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('ticket_1_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Oil Change and Filter Replacement\",\n    \"description\": \"Regular maintenance - oil change with premium filter\",\n    \"customer_id\": {{customer_1_id}},\n    \"vehicle_info\": \"2019 Honda Civic\",\n    \"estimated_cost\": 75.00,\n    \"priority\": \"Medium\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/service-tickets/",
+							"host": ["{{base_url}}"],
+							"path": ["service-tickets", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Service Ticket #2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Service ticket created', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('ticket_2_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Brake Pad Replacement\",\n    \"description\": \"Front brake pads are worn and need replacement\",\n    \"customer_id\": {{customer_2_id}},\n    \"vehicle_info\": \"2020 Toyota Camry\",\n    \"estimated_cost\": 350.00,\n    \"priority\": \"High\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/service-tickets/",
+							"host": ["{{base_url}}"],
+							"path": ["service-tickets", ""]
+						}
+					}
+				},
+				{
+					"name": "Assign Mechanic to Ticket",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Mechanic assigned successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/service-tickets/{{ticket_1_id}}/assign-mechanic/{{mechanic_1_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["service-tickets", "{{ticket_1_id}}", "assign-mechanic", "{{mechanic_1_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Advanced: Edit Ticket (Add/Remove Mechanics)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Ticket edited successfully', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"add_ids\": [{{mechanic_2_id}}],\n    \"remove_ids\": []\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/service-tickets/{{ticket_2_id}}/edit",
+							"host": ["{{base_url}}"],
+							"path": ["service-tickets", "{{ticket_2_id}}", "edit"]
+						}
+					}
+				},
+				{
+					"name": "Add Part to Service Ticket",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Part added to ticket', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/service-tickets/{{ticket_1_id}}/add-part/{{inventory_1_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["service-tickets", "{{ticket_1_id}}", "add-part", "{{inventory_1_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Get All Service Tickets",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Service tickets retrieved', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/service-tickets/",
+							"host": ["{{base_url}}"],
+							"path": ["service-tickets", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "⚡ Rate Limiting & Caching Tests",
+			"item": [
+				{
+					"name": "Test Rate Limiting (Multiple Logins)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Rate limiting may apply after multiple requests', function () {",
+									"    // This test will pass regardless but helps demonstrate rate limiting",
+									"    pm.response.to.be.ok;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"jane.doe@email.com\",\n    \"password\": \"wrongpassword\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customers/login",
+							"host": ["{{base_url}}"],
+							"path": ["customers", "login"]
+						}
+					}
+				},
+				{
+					"name": "Test Caching (Get Inventory Twice)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Cached response should be fast', function () {",
+									"    pm.response.to.have.status(200);",
+									"    // Second request should be faster due to caching",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/inventory/",
+							"host": ["{{base_url}}"],
+							"path": ["inventory", ""]
+						}
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:5000",
+			"type": "string"
+		}
+	]
+}

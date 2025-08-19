@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config, DevelopmentConfig, ProductionConfig, TestingConfig
-from app.extention import db, ma, migrate
+from app.extention import db, ma, migrate, limiter, cache
 
 def create_app(config_name='development'):
     """
@@ -40,21 +40,25 @@ def initialize_extensions(app):
     db.init_app(app)
     ma.init_app(app)
     migrate.init_app(app, db)
+    limiter.init_app(app)
+    cache.init_app(app)
     
     # Import models to ensure they're registered with SQLAlchemy
-    from app import models  
+    from app import models
 
 def register_blueprints(app):
     """Register all blueprints with the application"""
     # Import blueprints
-    from app.blueprints.customer import customer_bp      
-    from app.blueprints.mechanic import mechanic_bp      
-    from app.blueprints.service_ticket import service_ticket_bp  
+    from app.blueprints.customer import customer_bp
+    from app.blueprints.mechanic import mechanic_bp
+    from app.blueprints.service_ticket import service_ticket_bp
+    from app.blueprints.inventory import inventory_bp
     
     # Register blueprints with URL prefixes
     app.register_blueprint(customer_bp, url_prefix='/customers')
     app.register_blueprint(mechanic_bp, url_prefix='/mechanics')
     app.register_blueprint(service_ticket_bp, url_prefix='/service-tickets')
+    app.register_blueprint(inventory_bp, url_prefix='/inventory')
 
 def register_error_handlers(app):
     """Register error handlers for the application"""

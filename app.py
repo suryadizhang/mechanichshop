@@ -1,48 +1,50 @@
-"""
-Application entry point
-Creates and runs the Flask application using the Application Factory Pattern
-"""
-import os
+﻿import os
 from app import create_app
 from app.extention import db
-from app.models import Customer, Mechanic, ServiceTicket
+from app.models import Customer, Mechanic, ServiceTicket, Inventory
 
-# Get environment from environment variable or default to development
+# Get environment from environment variable (defaults to development)
 config_name = os.environ.get('FLASK_ENV', 'development')
 
-# Create application instance using factory pattern
+# Create the Flask app using factory pattern 
 app = create_app(config_name)
 
 @app.shell_context_processor
 def make_shell_context():
     """
-    Shell context processor for Flask shell
-    Makes database and models available in flask shell
+    This makes the models available when we run flask shell
+    Pretty convenient for testing stuff
     """
     return {
         'db': db,
         'Customer': Customer,
         'Mechanic': Mechanic,
-        'ServiceTicket': ServiceTicket
+        'ServiceTicket': ServiceTicket,
+        'Inventory': Inventory  # Added inventory model
     }
 
 @app.route('/')
 def index():
-    """Basic index route"""
+    """Basic index route - just shows API info"""
     return {
         'message': 'Welcome to Mechanic Shop API',
         'version': '1.0.0',
+        'status': 'Running',
         'endpoints': {
             'customers': '/customers',
-            'mechanics': '/mechanics',
-            'service_tickets': '/service-tickets'
+            'mechanics': '/mechanics', 
+            'service_tickets': '/service-tickets',
+            'inventory': '/inventory'  # Added this after implementing inventory
         }
     }
 
 if __name__ == '__main__':
-    # Create database tables
+    # Create database tables first
     with app.app_context():
         db.create_all()
+        print("Database tables created!")
     
-    # Run the application
+    # Run the development server
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+

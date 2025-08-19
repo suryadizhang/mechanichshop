@@ -12,17 +12,13 @@ class ServiceTicketSchema(ma.SQLAlchemyAutoSchema):
         include_relationships = True
         include_fk = True  # Include foreign keys like customer_id
     
-    
+    # Fields to match the actual model
     id = fields.Int(dump_only=True)
+    title = fields.Str(required=True, validate=validate.Length(min=1, max=200))
+    description = fields.Str(required=True, validate=validate.Length(min=1))
     customer_id = fields.Int(required=True)
-    vehicle_info = fields.Str(
-        required=True,
-        validate=validate.Length(min=1, max=200)
-    )
-    description = fields.Str(
-        required=True,
-        validate=validate.Length(min=1)
-    )
+    vehicle_info = fields.Str(validate=validate.Length(max=200))
+    estimated_cost = fields.Float(validate=validate.Range(min=0))
     status = fields.Str(
         validate=validate.OneOf([
             'Open', 'In Progress', 'Completed', 'Cancelled'
@@ -33,14 +29,9 @@ class ServiceTicketSchema(ma.SQLAlchemyAutoSchema):
             'Low', 'Medium', 'High', 'Urgent'
         ])
     )
-    estimated_hours = fields.Float(allow_none=True)
-    actual_hours = fields.Float(allow_none=True)
-    parts_cost = fields.Float(allow_none=True)
-    labor_cost = fields.Float(dump_only=True)
-    total_cost = fields.Float(dump_only=True)
+    completion_date = fields.Date(allow_none=True)
     created_at = fields.DateTime(dump_only=True)
-    completed_at = fields.DateTime(dump_only=True)
-    notes = fields.Str(allow_none=True)
+    updated_at = fields.DateTime(dump_only=True)
 
 
 service_ticket_schema = ServiceTicketSchema()
