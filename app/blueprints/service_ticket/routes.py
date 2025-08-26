@@ -30,10 +30,10 @@ def create_service_ticket():
 def assign_mechanic(ticket_id, mechanic_id):
     """PUT '/<ticket_id>/assign-mechanic/<mechanic_id>': Adds relationship between service ticket and mechanic"""
     # This was easier than the bulk edit route below
+    ticket = ServiceTicket.query.get_or_404(ticket_id)
+    mechanic = Mechanic.query.get_or_404(mechanic_id)
+    
     try:
-        ticket = ServiceTicket.query.get_or_404(ticket_id)
-        mechanic = Mechanic.query.get_or_404(mechanic_id)
-        
         # Check if mechanic is already assigned (avoid duplicates)
         if mechanic not in ticket.mechanics:
             # Use relationship attributes to treat the relationship like a list
@@ -52,10 +52,10 @@ def assign_mechanic(ticket_id, mechanic_id):
 @service_ticket_bp.route('/<int:ticket_id>/remove-mechanic/<int:mechanic_id>', methods=['PUT'])
 def remove_mechanic(ticket_id, mechanic_id):
     """PUT '/<ticket_id>/remove-mechanic/<mechanic_id>': Removes relationship from service ticket and mechanic"""
+    ticket = ServiceTicket.query.get_or_404(ticket_id)
+    mechanic = Mechanic.query.get_or_404(mechanic_id)
+    
     try:
-        ticket = ServiceTicket.query.get_or_404(ticket_id)
-        mechanic = Mechanic.query.get_or_404(mechanic_id)
-        
         # Check if mechanic is assigned to this ticket
         if mechanic in ticket.mechanics:
             # Use relationship attributes to treat the relationship like a list
@@ -79,8 +79,9 @@ def edit_ticket_mechanics(ticket_id):
     PUT '/<int:ticket_id>/edit': Add and remove mechanics from a ticket
     This is the advanced query requirement - bulk operations
     """
+    ticket = ServiceTicket.query.get_or_404(ticket_id)
+    
     try:
-        ticket = ServiceTicket.query.get_or_404(ticket_id)
         data = request.get_json()
         
         # Remove mechanics first
@@ -117,10 +118,10 @@ def add_part_to_ticket(ticket_id, inventory_id):
     PUT '/<int:ticket_id>/add-part/<int:inventory_id>': Add a single part to a service ticket
     This connects inventory to service tickets - assignment requirement
     """
+    ticket = ServiceTicket.query.get_or_404(ticket_id)
+    inventory_item = Inventory.query.get_or_404(inventory_id)
+    
     try:
-        ticket = ServiceTicket.query.get_or_404(ticket_id)
-        inventory_item = Inventory.query.get_or_404(inventory_id)
-        
         # Check if part is already added to this ticket (avoid duplicates)
         if inventory_item not in ticket.inventory_items:
             ticket.inventory_items.append(inventory_item)

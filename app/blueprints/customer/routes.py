@@ -17,7 +17,7 @@ def get_customers():
     """Get all customers with pagination (assignment requirement)"""
     # Get page parameters from request
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 5, type=int)
+    per_page = request.args.get('per_page', 2, type=int)
     
     # Paginate the query
     customers = Customer.query.paginate(

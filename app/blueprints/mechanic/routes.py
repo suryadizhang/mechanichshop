@@ -84,9 +84,9 @@ def update_mechanic(current_mechanic_id, id):
     """PUT '/<int:id>': Updates a specific Mechanic (employee access)"""
     # Employees can update any mechanic record for business operations
     
+    mechanic = Mechanic.query.get_or_404(id)
+    
     try:
-        mechanic = Mechanic.query.get_or_404(id)
-        
         # Set the instance on the schema for updates
         update_schema = MechanicSchema()
         update_schema.instance = mechanic
@@ -107,8 +107,8 @@ def delete_mechanic(current_mechanic_id, id):
     """DELETE '/<int:id>': Deletes a specific Mechanic (employee access)"""
     # Employees can delete any mechanic record for business operations
     
+    mechanic = Mechanic.query.get_or_404(id)
     try:
-        mechanic = Mechanic.query.get_or_404(id)
         db.session.delete(mechanic)
         db.session.commit()
         return jsonify({'message': 'Mechanic deleted successfully'}), 200

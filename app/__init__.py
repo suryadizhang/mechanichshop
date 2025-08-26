@@ -1,30 +1,27 @@
-from flask import Flask
+from flask import Flask, jsonify
+from flask_swagger import swagger
+from flask_swagger_ui import get_swaggerui_blueprint
 from config import Config, DevelopmentConfig, ProductionConfig, TestingConfig
 from app.extention import db, ma, migrate, limiter, cache
+from app.swagger_config import swagger_config
 
 def create_app(config_name='development'):
     """
-    Application factory function that creates and configures Flask app instances
-    
-    Args:
-        config_name (str): Configuration environment ('development', 'production', 'testing')
-    
-    Returns:
-        Flask: Configured Flask application instance
+    Application factory function
+    Creates and configures a Flask application instance
     """
-    # Create Flask application instance
     app = Flask(__name__)
     
-    # Configure the application based on environment
-    config_mapping = {
+    # Configuration mapping
+    config_classes = {
         'development': DevelopmentConfig,
         'production': ProductionConfig,
         'testing': TestingConfig
     }
     
-    app.config.from_object(config_mapping.get(config_name, DevelopmentConfig))
+    app.config.from_object(config_classes.get(config_name, DevelopmentConfig))
     
-    # Initialize extensions with the app
+    # Initialize extensions
     initialize_extensions(app)
     
     # Register blueprints
@@ -32,6 +29,9 @@ def create_app(config_name='development'):
     
     # Register error handlers
     register_error_handlers(app)
+    
+    # Add Swagger documentation
+    register_swagger(app)
     
     return app
 
@@ -73,3 +73,26 @@ def register_error_handlers(app):
     @app.errorhandler(500)
     def internal_error(error):
         return {'error': 'Internal server error'}, 500
+
+def register_swagger(app):
+    """Register Swagger documentation"""
+    # Swagger UI configuration
+    SWAGGER_URL = '/swagger'
+    API_URL = '/swagger.json'
+    
+    # Register the Swagger UI blueprint
+    swaggerui_blueprint = get_swaggerui_blueprint(
+        SWAGGER_URL,
+        API_URL,
+        config={
+            'app_name': 'Mechanic Shop API Documentation',
+            'dom_id': '#swagger-ui',
+            'layout': 'StandaloneLayout'
+        }
+    )
+    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+    @app.route('/swagger.json')
+    def swagger_json():
+        """Return the Swagger specification"""
+        return swagger_config

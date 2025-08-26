@@ -19,8 +19,7 @@ def create_inventory(current_mechanic_id):
         inventory_data = inventory_schema.load(request.json)
         db.session.add(inventory_data)
         db.session.commit()
-        # Clear cache since we added new inventory
-        cache.delete_memoized(get_inventories)
+        # Cache will expire automatically after 5 minutes
         return inventory_schema.jsonify(inventory_data), 201
     except Exception as e:
         db.session.rollback()
@@ -49,13 +48,11 @@ def get_inventory(id):
 def update_inventory(current_mechanic_id, id):
     """PUT '/<int:id>': Updates a specific Inventory item (mechanic only)"""
     # Mechanics need to update stock levels and prices
+    inventory = Inventory.query.get_or_404(id)
     try:
-        inventory = Inventory.query.get_or_404(id)
         updated_inventory = inventory_schema.load(request.json, instance=inventory, partial=True)
         db.session.commit()
-        # Clear cache after update
-        cache.delete_memoized(get_inventories)
-        cache.delete_memoized(get_inventory, id)
+        # Cache will expire automatically after 5 minutes
         return inventory_schema.jsonify(updated_inventory), 200
     except Exception as e:
         db.session.rollback()
@@ -68,13 +65,11 @@ def update_inventory(current_mechanic_id, id):
 def delete_inventory(current_mechanic_id, id):
     """DELETE '/<int:id>': Deletes a specific Inventory item (mechanic only)"""
     # Careful with deletions - might want to soft delete in production
+    inventory = Inventory.query.get_or_404(id)
     try:
-        inventory = Inventory.query.get_or_404(id)
         db.session.delete(inventory)
         db.session.commit()
-        # Clear cache after deletion
-        cache.delete_memoized(get_inventories)
-        cache.delete_memoized(get_inventory, id)
+        # Cache will expire automatically after 5 minutes
         return jsonify({'message': 'Inventory item deleted successfully'}), 200
     except Exception as e:
         db.session.rollback()
