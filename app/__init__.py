@@ -1,9 +1,7 @@
 from flask import Flask, jsonify
-from flask_swagger import swagger
 from flask_swagger_ui import get_swaggerui_blueprint
 from config import Config, DevelopmentConfig, ProductionConfig, TestingConfig
 from app.extention import db, ma, migrate, limiter, cache
-from app.swagger_config import swagger_config
 
 def create_app(config_name='development'):
     """
@@ -75,24 +73,37 @@ def register_error_handlers(app):
         return {'error': 'Internal server error'}, 500
 
 def register_swagger(app):
-    """Register Swagger documentation"""
-    # Swagger UI configuration
-    SWAGGER_URL = '/swagger'
-    API_URL = '/swagger.json'
+    """Register Swagger documentation using static YAML file"""
+    # Swagger UI configuration - following lesson format
+    SWAGGER_URL = '/api/docs'  # URL for exposing Swagger UI
+    API_URL = '/static/swagger.yaml'  # Our API URL (static YAML resource)
     
-    # Register the Swagger UI blueprint
+    # Create Swagger UI blueprint following lesson example
     swaggerui_blueprint = get_swaggerui_blueprint(
         SWAGGER_URL,
         API_URL,
         config={
-            'app_name': 'Mechanic Shop API Documentation',
-            'dom_id': '#swagger-ui',
-            'layout': 'StandaloneLayout'
+            'app_name': "Mechanic Shop API"
         }
     )
+    
+    # Register the blueprint with the app
     app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
-    @app.route('/swagger.json')
-    def swagger_json():
-        """Return the Swagger specification"""
-        return swagger_config
+    # Health check routes
+    @app.route('/health')
+    def health_check():
+        """Health check endpoint"""
+        return jsonify({
+            'status': 'healthy',
+            'message': 'Mechanic Shop API is running'
+        }), 200
+
+    @app.route('/info')
+    def api_info():
+        """API information endpoint"""
+        return jsonify({
+            'api_name': 'Mechanic Shop API',
+            'version': '1.0.0',
+            'description': 'Flask API for managing a mechanic shop'
+        }), 200
