@@ -110,8 +110,18 @@ class TestMechanicRoutes(BaseTestCase):
         
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertIsInstance(data, list)
-        self.assertGreater(len(data), 0)
+        
+        # Check pagination structure
+        self.assertIsInstance(data, dict)
+        self.assertIn('mechanics', data)
+        self.assertIn('total', data)
+        self.assertIn('pages', data)
+        self.assertIn('current_page', data)
+        
+        # Check mechanics array
+        self.assertIsInstance(data['mechanics'], list)
+        self.assertGreater(len(data['mechanics']), 0)
+        self.assertGreater(data['total'], 0)
     
     def test_get_mechanics_by_tickets(self):
         """Test advanced query - mechanics ordered by ticket count"""

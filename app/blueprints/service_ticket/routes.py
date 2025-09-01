@@ -139,7 +139,26 @@ def add_part_to_ticket(ticket_id, inventory_id):
 
 @service_ticket_bp.route('/', methods=['GET'])
 def get_service_tickets():
-    """GET '/': Retrieves all service tickets"""
-    # Simple endpoint, might want to add pagination later
-    tickets = ServiceTicket.query.all()
-    return service_tickets_schema.jsonify(tickets), 200
+    """GET '/': Retrieves all service tickets with pagination"""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    tickets = ServiceTicket.query.paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    
+    return jsonify({
+        'service_tickets': service_tickets_schema.dump(tickets.items),
+        'total': tickets.total,
+        'pages': tickets.pages,
+        'current_page': tickets.page,
+        'has_next': tickets.has_next,
+        'has_prev': tickets.has_prev
+    }), 200
+
+
+@service_ticket_bp.route('/<int:ticket_id>', methods=['GET'])
+def get_service_ticket(ticket_id):
+    """GET '/<int:ticket_id>': Retrieve a specific service ticket"""
+    ticket = ServiceTicket.query.get_or_404(ticket_id)
+    return service_ticket_schema.jsonify(ticket), 200

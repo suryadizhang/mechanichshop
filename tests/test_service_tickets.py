@@ -111,8 +111,18 @@ class TestServiceTicketRoutes(BaseTestCase):
         
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertIsInstance(data, list)
-        self.assertGreater(len(data), 0)
+        
+        # Check pagination structure
+        self.assertIsInstance(data, dict)
+        self.assertIn('service_tickets', data)
+        self.assertIn('total', data)
+        self.assertIn('pages', data)
+        self.assertIn('current_page', data)
+        
+        # Check service tickets array
+        self.assertIsInstance(data['service_tickets'], list)
+        self.assertGreater(len(data['service_tickets']), 0)
+        self.assertGreater(data['total'], 0)
     
     def test_assign_mechanic_to_ticket(self):
         """Test assigning a mechanic to a service ticket"""

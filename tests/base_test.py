@@ -31,8 +31,14 @@ class BaseTestCase(unittest.TestCase):
     
     def tearDown(self):
         """Tear down test fixtures after each test method"""
+        # Close all database sessions properly
+        db.session.close()
         db.session.remove()
         db.drop_all()
+        
+        # Close database connections
+        db.engine.dispose()
+        
         self.app_context.pop()
     
     def create_test_data(self):

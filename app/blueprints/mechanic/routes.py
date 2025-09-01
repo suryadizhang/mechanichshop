@@ -50,10 +50,22 @@ def mechanic_login():
 
 @mechanic_bp.route('/', methods=['GET'])
 def get_mechanics():
-    """GET '/': Retrieves all Mechanics"""
-    # Simple endpoint, no auth needed for viewing mechanics
-    mechanics = Mechanic.query.all()
-    return mechanics_schema.jsonify(mechanics), 200
+    """GET '/': Retrieves all Mechanics with pagination"""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    mechanics = Mechanic.query.paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    
+    return jsonify({
+        'mechanics': mechanics_schema.dump(mechanics.items),
+        'total': mechanics.total,
+        'pages': mechanics.pages,
+        'current_page': mechanics.page,
+        'has_next': mechanics.has_next,
+        'has_prev': mechanics.has_prev
+    }), 200
 
 
 @mechanic_bp.route('/by-tickets', methods=['GET'])
@@ -76,6 +88,13 @@ def get_mechanics_by_tickets():
         result.append(mechanic_data)
     
     return jsonify(result), 200
+
+
+@mechanic_bp.route('/<int:id>', methods=['GET'])
+def get_mechanic(id):
+    """GET '/<int:id>': Retrieve a specific mechanic by ID"""
+    mechanic = Mechanic.query.get_or_404(id)
+    return mechanic_schema.jsonify(mechanic), 200
 
 
 @mechanic_bp.route('/<int:id>', methods=['PUT'])

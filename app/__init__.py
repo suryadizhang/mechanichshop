@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
 from config import Config, DevelopmentConfig, ProductionConfig, TestingConfig
 from app.extention import db, ma, migrate, limiter, cache
@@ -35,6 +36,9 @@ def create_app(config_name='development'):
 
 def initialize_extensions(app):
     """Initialize Flask extensions with app instance"""
+    # Enable CORS for all routes
+    CORS(app)
+    
     db.init_app(app)
     ma.init_app(app)
     migrate.init_app(app, db)
@@ -89,21 +93,3 @@ def register_swagger(app):
     
     # Register the blueprint with the app
     app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
-
-    # Health check routes
-    @app.route('/health')
-    def health_check():
-        """Health check endpoint"""
-        return jsonify({
-            'status': 'healthy',
-            'message': 'Mechanic Shop API is running'
-        }), 200
-
-    @app.route('/info')
-    def api_info():
-        """API information endpoint"""
-        return jsonify({
-            'api_name': 'Mechanic Shop API',
-            'version': '1.0.0',
-            'description': 'Flask API for managing a mechanic shop'
-        }), 200
