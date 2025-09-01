@@ -162,3 +162,33 @@ def get_service_ticket(ticket_id):
     """GET '/<int:ticket_id>': Retrieve a specific service ticket"""
     ticket = ServiceTicket.query.get_or_404(ticket_id)
     return service_ticket_schema.jsonify(ticket), 200
+
+
+@service_ticket_bp.route('/<int:ticket_id>', methods=['PUT'])
+def update_service_ticket(ticket_id):
+    """PUT '/<int:ticket_id>': Updates a specific service ticket"""
+    ticket = ServiceTicket.query.get_or_404(ticket_id)
+    
+    try:
+        updated_ticket = service_ticket_schema.load(
+            request.json, instance=ticket, partial=True
+        )
+        db.session.commit()
+        return service_ticket_schema.jsonify(updated_ticket), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
+
+@service_ticket_bp.route('/<int:ticket_id>', methods=['DELETE'])
+def delete_service_ticket(ticket_id):
+    """DELETE '/<int:ticket_id>': Deletes a specific service ticket"""
+    ticket = ServiceTicket.query.get_or_404(ticket_id)
+    
+    try:
+        db.session.delete(ticket)
+        db.session.commit()
+        return jsonify({'message': 'Service ticket deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400

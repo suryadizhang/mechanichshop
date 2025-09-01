@@ -94,11 +94,39 @@ def get_customer(id):
     return customer_schema.jsonify(customer), 200
 
 
+@customer_bp.route('/', methods=['PUT'])
+@token_required
+def update_current_customer(current_customer_id):
+    """PUT '/': Updates the current authenticated customer's profile"""
+    # Customers can update their own profile
+    
+    customer = Customer.query.get_or_404(current_customer_id)
+    
+    try:
+        # Set the instance on the schema for updates
+        update_schema = CustomerSchema()
+        update_schema.instance = customer
+        
+        # Load the updated data
+        updated_customer = update_schema.load(request.json, partial=True)
+        
+        db.session.commit()
+        # Clear cache after update
+        cache.delete_memoized(get_customers)
+        return customer_schema.jsonify(updated_customer), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
+
 @customer_bp.route('/<int:id>', methods=['PUT'])
 @token_required
 def update_customer(current_customer_id, id):
-    """Update customer information (employee/mechanic access)"""
-    # Employees can update any customer record for business operations
+    """PUT '/<int:id>': Updates a specific customer by ID"""
+    # Only allow customers to update their own profile
+    if current_customer_id != id:
+        return jsonify({'error': 'You can only update your own profile'}), 403
+    
     try:
         customer = Customer.query.get_or_404(id)
         
@@ -118,11 +146,34 @@ def update_customer(current_customer_id, id):
         return jsonify({'error': str(e)}), 400
 
 
+@customer_bp.route('/', methods=['DELETE'])
+@token_required
+def delete_current_customer(current_customer_id):
+    """DELETE '/': Deletes the current authenticated customer's account"""
+    # Customers can delete their own account
+    
+    customer = Customer.query.get_or_404(current_customer_id)
+    try:
+        db.session.delete(customer)
+        db.session.commit()
+        # Clear cache after deletion
+        cache.delete_memoized(get_customers)
+        return jsonify({
+            'message': 'Customer account deleted successfully'
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
+
 @customer_bp.route('/<int:id>', methods=['DELETE'])
 @token_required
 def delete_customer(current_customer_id, id):
-    """Delete a customer (employee access)"""
-    # Employees can delete any customer record for business operations
+    """DELETE '/<int:id>': Deletes a specific customer by ID"""
+    # Only allow customers to delete their own account
+    if current_customer_id != id:
+        return jsonify({'error': 'You can only delete your own account'}), 403
+    
     try:
         customer = Customer.query.get_or_404(id)
         db.session.delete(customer)
