@@ -6,7 +6,7 @@ from flask import jsonify
 from datetime import datetime
 
 # Get environment from environment variable (defaults to development)
-config_name = os.environ.get('FLASK_ENV', 'development')
+config_name = os.environ.get("FLASK_ENV", "development")
 
 # Create the Flask app using factory pattern
 app = create_app(config_name)
@@ -19,66 +19,77 @@ def make_shell_context():
     Pretty convenient for testing stuff
     """
     return {
-        'db': db,
-        'Customer': Customer,
-        'Mechanic': Mechanic,
-        'ServiceTicket': ServiceTicket,
-        'Inventory': Inventory  # Added inventory model
+        "db": db,
+        "Customer": Customer,
+        "Mechanic": Mechanic,
+        "ServiceTicket": ServiceTicket,
+        "Inventory": Inventory,  # Added inventory model
     }
 
 
-@app.route('/')
+@app.route("/")
 def index():
     """Basic index route - just shows API info"""
     return {
-        'message': 'Welcome to Mechanic Shop API',
-        'version': '1.0.0',
-        'status': 'Running',
-        'endpoints': {
-            'customers': '/customers',
-            'mechanics': '/mechanics',
-            'service_tickets': '/service-tickets',
-            'inventory': '/inventory'  # Added after implementing inventory
-        }
+        "message": "Welcome to Mechanic Shop API",
+        "version": "1.0.0",
+        "status": "Running",
+        "endpoints": {
+            "customers": "/customers",
+            "mechanics": "/mechanics",
+            "service_tickets": "/service-tickets",
+            "inventory": "/inventory",  # Added after implementing inventory
+        },
     }
 
 
-@app.route('/health', methods=['GET'])
+@app.route("/health", methods=["GET"])
 def health_check():
     """API Health Check endpoint"""
-    return jsonify({
-        'status': 'healthy',
-        'message': 'API is running successfully',
-        'timestamp': datetime.utcnow().isoformat(),
-        'version': '1.0.0'
-    }), 200
+    return (
+        jsonify(
+            {
+                "status": "healthy",
+                "message": "API is running successfully",
+                "timestamp": datetime.utcnow().isoformat(),
+                "version": "1.0.0",
+            }
+        ),
+        200,
+    )
 
 
-@app.route('/info', methods=['GET'])
+@app.route("/info", methods=["GET"])
 def api_info():
     """API Information endpoint"""
-    return jsonify({
-        'name': 'Mechanic Shop API',
-        'version': '1.0.0',
-        'description': 'A comprehensive API for managing mechanic shop ops',
-        'endpoints': {
-            'customers': '/customers',
-            'mechanics': '/mechanics',
-            'service_tickets': '/service-tickets',
-            'inventory': '/inventory',
-            'health': '/health',
-            'info': '/info'
-        },
-        'documentation': '/api/docs',
-        'status': 'operational'
-    }), 200
+    return (
+        jsonify(
+            {
+                "name": "Mechanic Shop API",
+                "version": "1.0.0",
+                "description": "A comprehensive API for managing mechanic " +
+                               "shop operations",
+                "endpoints": {
+                    "customers": "/customers",
+                    "mechanics": "/mechanics",
+                    "service_tickets": "/service-tickets",
+                    "inventory": "/inventory",
+                    "health": "/health",
+                    "info": "/info",
+                },
+                "documentation": "/api/docs",
+                "status": "operational",
+            }
+        ),
+        200,
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Create database tables first
     with app.app_context():
         db.create_all()
         print("Database tables created!")
 
     # Run the development server
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)

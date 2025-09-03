@@ -5,7 +5,7 @@ from config import DevelopmentConfig, ProductionConfig, TestingConfig
 from app.extention import db, ma, migrate, limiter, cache
 
 
-def create_app(config_name='development'):
+def create_app(config_name="development"):
     """
     Application factory function
     Creates and configures a Flask application instance
@@ -14,9 +14,9 @@ def create_app(config_name='development'):
 
     # Configuration mapping
     config_classes = {
-        'development': DevelopmentConfig,
-        'production': ProductionConfig,
-        'testing': TestingConfig
+        "development": DevelopmentConfig,
+        "production": ProductionConfig,
+        "testing": TestingConfig,
     }
 
     app.config.from_object(config_classes.get(config_name, DevelopmentConfig))
@@ -60,40 +60,37 @@ def register_blueprints(app):
     from app.blueprints.inventory import inventory_bp
 
     # Register blueprints with URL prefixes
-    app.register_blueprint(customer_bp, url_prefix='/customers')
-    app.register_blueprint(mechanic_bp, url_prefix='/mechanics')
-    app.register_blueprint(service_ticket_bp, url_prefix='/service-tickets')
-    app.register_blueprint(inventory_bp, url_prefix='/inventory')
+    app.register_blueprint(customer_bp, url_prefix="/customers")
+    app.register_blueprint(mechanic_bp, url_prefix="/mechanics")
+    app.register_blueprint(service_ticket_bp, url_prefix="/service-tickets")
+    app.register_blueprint(inventory_bp, url_prefix="/inventory")
 
 
 def register_error_handlers(app):
     """Register error handlers for the application"""
+
     @app.errorhandler(404)
     def not_found(error):
-        return {'error': 'Resource not found'}, 404
+        return {"error": "Resource not found"}, 404
 
     @app.errorhandler(400)
     def bad_request(error):
-        return {'error': 'Bad request'}, 400
+        return {"error": "Bad request"}, 400
 
     @app.errorhandler(500)
     def internal_error(error):
-        return {'error': 'Internal server error'}, 500
+        return {"error": "Internal server error"}, 500
 
 
 def register_swagger(app):
     """Register Swagger documentation using static YAML file"""
     # Swagger UI configuration - following lesson format
-    SWAGGER_URL = '/api/docs'  # URL for exposing Swagger UI
-    API_URL = '/static/swagger.yaml'  # Our API URL (static YAML resource)
+    SWAGGER_URL = "/api/docs"  # URL for exposing Swagger UI
+    API_URL = "/static/swagger.yaml"  # Our API URL (static YAML resource)
 
     # Create Swagger UI blueprint following lesson example
     swaggerui_blueprint = get_swaggerui_blueprint(
-        SWAGGER_URL,
-        API_URL,
-        config={
-            'app_name': "Mechanic Shop API"
-        }
+        SWAGGER_URL, API_URL, config={"app_name": "Mechanic Shop API"}
     )
 
     # Register the blueprint with the app
