@@ -11,6 +11,7 @@ config_name = os.environ.get('FLASK_ENV', 'development')
 # Create the Flask app using factory pattern
 app = create_app(config_name)
 
+
 @app.shell_context_processor
 def make_shell_context():
     """
@@ -25,6 +26,7 @@ def make_shell_context():
         'Inventory': Inventory  # Added inventory model
     }
 
+
 @app.route('/')
 def index():
     """Basic index route - just shows API info"""
@@ -36,7 +38,7 @@ def index():
             'customers': '/customers',
             'mechanics': '/mechanics',
             'service_tickets': '/service-tickets',
-            'inventory': '/inventory'  # Added this after implementing inventory
+            'inventory': '/inventory'  # Added after implementing inventory
         }
     }
 
@@ -58,7 +60,7 @@ def api_info():
     return jsonify({
         'name': 'Mechanic Shop API',
         'version': '1.0.0',
-        'description': 'A comprehensive API for managing mechanic shop operations',
+        'description': 'A comprehensive API for managing mechanic shop ops',
         'endpoints': {
             'customers': '/customers',
             'mechanics': '/mechanics',
@@ -70,6 +72,7 @@ def api_info():
         'documentation': '/api/docs',
         'status': 'operational'
     }), 200
+
 
 if __name__ == '__main__':
     # Create database tables first

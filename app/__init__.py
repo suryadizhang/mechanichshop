@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
-from config import Config, DevelopmentConfig, ProductionConfig, TestingConfig
+from config import DevelopmentConfig, ProductionConfig, TestingConfig
 from app.extention import db, ma, migrate, limiter, cache
+
 
 def create_app(config_name='development'):
     """
@@ -34,6 +35,7 @@ def create_app(config_name='development'):
 
     return app
 
+
 def initialize_extensions(app):
     """Initialize Flask extensions with app instance"""
     # Enable CORS for all routes
@@ -46,7 +48,8 @@ def initialize_extensions(app):
     cache.init_app(app)
 
     # Import models to ensure they're registered with SQLAlchemy
-    from app import models
+    import app.models  # noqa: F401
+
 
 def register_blueprints(app):
     """Register all blueprints with the application"""
@@ -62,6 +65,7 @@ def register_blueprints(app):
     app.register_blueprint(service_ticket_bp, url_prefix='/service-tickets')
     app.register_blueprint(inventory_bp, url_prefix='/inventory')
 
+
 def register_error_handlers(app):
     """Register error handlers for the application"""
     @app.errorhandler(404)
@@ -75,6 +79,7 @@ def register_error_handlers(app):
     @app.errorhandler(500)
     def internal_error(error):
         return {'error': 'Internal server error'}, 500
+
 
 def register_swagger(app):
     """Register Swagger documentation using static YAML file"""
