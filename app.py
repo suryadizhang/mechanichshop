@@ -67,8 +67,8 @@ def api_info():
             {
                 "name": "Mechanic Shop API",
                 "version": "1.0.0",
-                "description": "A comprehensive API for managing mechanic " +
-                               "shop operations",
+                "description": "A comprehensive API for managing mechanic "
+                + "shop operations",
                 "endpoints": {
                     "customers": "/customers",
                     "mechanics": "/mechanics",
