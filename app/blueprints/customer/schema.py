@@ -5,13 +5,13 @@ from marshmallow import fields, validate, validates, ValidationError, post_load
 
 class CustomerSchema(ma.SQLAlchemyAutoSchema):
     """Schema for Customer model - handles validation and JSON conversion"""
-    
+
     class Meta:
         model = Customer
-        load_instance = False  
+        load_instance = False
         exclude = ('password_hash',)  # Don't expose password hash in JSON!
-    
-    # Field validations 
+
+    # Field validations
     name = fields.Str(
         required=True,
         validate=validate.Length(min=2, max=100, error="Name must be between 2 and 100 characters")
@@ -32,27 +32,27 @@ class CustomerSchema(ma.SQLAlchemyAutoSchema):
         load_only=True,
         validate=validate.Length(min=6, error="Password must be at least 6 characters")
     )
-    
+
     # Read-only fields
     id = fields.Int(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
-    
+
     # Nested relationship (optional, for detailed views)
     service_tickets = fields.Nested('ServiceTicketSchema', many=True, exclude=('customer',), dump_only=True)
-    
+
     @validates('email')
     def validate_email_unique(self, value):
         """Custom validation to ensure email uniqueness"""
         existing_customer = Customer.query.filter_by(email=value).first()
         if existing_customer and existing_customer.id != getattr(self.instance, 'id', None):
             raise ValidationError('Email address already exists')
-    
+
     @post_load
     def make_customer(self, data, **kwargs):
         """Create customer instance and handle password hashing"""
         # Extract password if present
         password = data.pop('password', None)
-        
+
         # Create or update customer instance
         if self.instance:
             # Updating existing customer
@@ -62,11 +62,11 @@ class CustomerSchema(ma.SQLAlchemyAutoSchema):
         else:
             # Creating new customer
             customer = Customer(**data)
-        
+
         # Set password if provided
         if password:
             customer.set_password(password)
-        
+
         return customer
 
 

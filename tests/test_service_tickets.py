@@ -2,6 +2,7 @@
 Unit tests for Service Ticket endpoints
 Tests all service ticket-related routes including positive and negative cases
 """
+
 import unittest
 from tests.base_test import BaseTestCase
 from app.models import ServiceTicket, Inventory
@@ -22,7 +23,7 @@ class TestServiceTicketRoutes(BaseTestCase):
             customer_id=self.customer_id,
             vehicle_info="2020 Test Car",
             estimated_cost=100.00,
-            priority="Medium"
+            priority="Medium",
         )
 
         # Create test inventory item
@@ -31,7 +32,7 @@ class TestServiceTicketRoutes(BaseTestCase):
             description="Test part description",
             price=25.99,
             quantity=10,
-            category="Test Category"
+            category="Test Category",
         )
 
         db.session.add(self.test_ticket)
@@ -49,16 +50,16 @@ class TestServiceTicketRoutes(BaseTestCase):
             "customer_id": self.customer_id,
             "vehicle_info": "2019 Honda Civic",
             "estimated_cost": 75.00,
-            "priority": "Medium"
+            "priority": "Medium",
         }
 
-        response = self.client.post('/service-tickets/', json=ticket_data)
+        response = self.client.post("/service-tickets/", json=ticket_data)
 
         self.assertEqual(response.status_code, 201)
         data = response.get_json()
-        self.assertEqual(data['title'], ticket_data['title'])
-        self.assertEqual(data['customer_id'], ticket_data['customer_id'])
-        self.assertEqual(data['priority'], ticket_data['priority'])
+        self.assertEqual(data["title"], ticket_data["title"])
+        self.assertEqual(data["customer_id"], ticket_data["customer_id"])
+        self.assertEqual(data["priority"], ticket_data["priority"])
 
     def test_create_service_ticket_missing_fields(self):
         """Test service ticket creation with missing required fields"""
@@ -67,11 +68,11 @@ class TestServiceTicketRoutes(BaseTestCase):
             # Missing description, customer_id
         }
 
-        response = self.client.post('/service-tickets/', json=ticket_data)
+        response = self.client.post("/service-tickets/", json=ticket_data)
 
         self.assertEqual(response.status_code, 400)
         data = response.get_json()
-        self.assertIn('error', data)
+        self.assertIn("error", data)
 
     def test_create_service_ticket_invalid_priority(self):
         """Test service ticket creation with invalid priority"""
@@ -79,14 +80,14 @@ class TestServiceTicketRoutes(BaseTestCase):
             "title": "Invalid Priority Ticket",
             "description": "Test description",
             "customer_id": self.customer_id,
-            "priority": "InvalidPriority"
+            "priority": "InvalidPriority",
         }
 
-        response = self.client.post('/service-tickets/', json=ticket_data)
+        response = self.client.post("/service-tickets/", json=ticket_data)
 
         self.assertEqual(response.status_code, 400)
         data = response.get_json()
-        self.assertIn('error', data)
+        self.assertIn("error", data)
 
     def test_create_service_ticket_nonexistent_customer(self):
         """Test service ticket creation with non-existent customer"""
@@ -94,50 +95,52 @@ class TestServiceTicketRoutes(BaseTestCase):
             "title": "Orphan Ticket",
             "description": "Test description",
             "customer_id": 999,  # Non-existent customer ID
-            "vehicle_info": "Test Vehicle"
+            "vehicle_info": "Test Vehicle",
         }
 
-        response = self.client.post('/service-tickets/', json=ticket_data)
+        response = self.client.post("/service-tickets/", json=ticket_data)
 
         # Service tickets can be created without valid customer (walk-ins)
         self.assertEqual(response.status_code, 201)
         data = response.get_json()
-        self.assertEqual(data['customer_id'], 999)
-        self.assertIsNone(data['customer'])  # Customer relationship None
+        self.assertEqual(data["customer_id"], 999)
+        self.assertIsNone(data["customer"])  # Customer relationship None
 
     def test_get_all_service_tickets(self):
         """Test retrieving all service tickets"""
-        response = self.client.get('/service-tickets/')
+        response = self.client.get("/service-tickets/")
 
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
 
         # Check pagination structure
         self.assertIsInstance(data, dict)
-        self.assertIn('service_tickets', data)
-        self.assertIn('total', data)
-        self.assertIn('pages', data)
-        self.assertIn('current_page', data)
+        self.assertIn("service_tickets", data)
+        self.assertIn("total", data)
+        self.assertIn("pages", data)
+        self.assertIn("current_page", data)
 
         # Check service tickets array
-        self.assertIsInstance(data['service_tickets'], list)
-        self.assertGreater(len(data['service_tickets']), 0)
-        self.assertGreater(data['total'], 0)
+        self.assertIsInstance(data["service_tickets"], list)
+        self.assertGreater(len(data["service_tickets"]), 0)
+        self.assertGreater(data["total"], 0)
 
     def test_assign_mechanic_to_ticket(self):
         """Test assigning a mechanic to a service ticket"""
-        url = (f'/service-tickets/{self.ticket_id}/assign-mechanic/'
-               f'{self.mechanic_id}')
+        url = (
+            f"/service-tickets/{self.ticket_id}/assign-mechanic/"
+            f"{self.mechanic_id}"
+        )
 
         response = self.client.put(url)
 
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertIn('message', data)
+        self.assertIn("message", data)
 
     def test_assign_nonexistent_mechanic(self):
         """Test assigning non-existent mechanic to ticket"""
-        url = f'/service-tickets/{self.ticket_id}/assign-mechanic/999'
+        url = f"/service-tickets/{self.ticket_id}/assign-mechanic/999"
 
         response = self.client.put(url)
 
@@ -145,7 +148,7 @@ class TestServiceTicketRoutes(BaseTestCase):
 
     def test_assign_mechanic_to_nonexistent_ticket(self):
         """Test assigning mechanic to non-existent ticket"""
-        url = f'/service-tickets/999/assign-mechanic/{self.mechanic_id}'
+        url = f"/service-tickets/999/assign-mechanic/{self.mechanic_id}"
 
         response = self.client.put(url)
 
@@ -154,71 +157,76 @@ class TestServiceTicketRoutes(BaseTestCase):
     def test_remove_mechanic_from_ticket(self):
         """Test removing a mechanic from a service ticket"""
         # First assign mechanic
-        assign_url = (f'/service-tickets/{self.ticket_id}/assign-mechanic/'
-                      f'{self.mechanic_id}')
+        assign_url = (
+            f"/service-tickets/{self.ticket_id}/assign-mechanic/"
+            f"{self.mechanic_id}"
+        )
         self.client.put(assign_url)
 
         # Then remove mechanic
-        remove_url = (f'/service-tickets/{self.ticket_id}/remove-mechanic/'
-                      f'{self.mechanic_id}')
+        remove_url = (
+            f"/service-tickets/{self.ticket_id}/remove-mechanic/"
+            f"{self.mechanic_id}"
+        )
         response = self.client.put(remove_url)
 
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertIn('message', data)
+        self.assertIn("message", data)
 
     def test_remove_unassigned_mechanic(self):
         """Test removing mechanic that wasn't assigned to ticket"""
-        url = (f'/service-tickets/{self.ticket_id}/remove-mechanic/'
-               f'{self.mechanic_id}')
+        url = (
+            f"/service-tickets/{self.ticket_id}/remove-mechanic/"
+            f"{self.mechanic_id}"
+        )
 
         response = self.client.put(url)
 
         self.assertEqual(response.status_code, 400)
         data = response.get_json()
-        self.assertIn('error', data)
+        self.assertIn("error", data)
 
     def test_bulk_edit_ticket_mechanics(self):
         """Test bulk editing mechanics on a ticket (add/remove)"""
-        edit_data = {
-            "add_ids": [self.mechanic_id],
-            "remove_ids": []
-        }
+        edit_data = {"add_ids": [self.mechanic_id], "remove_ids": []}
 
-        response = self.client.put(f'/service-tickets/{self.ticket_id}/edit',
-                                   json=edit_data)
+        response = self.client.put(
+            f"/service-tickets/{self.ticket_id}/edit", json=edit_data
+        )
 
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertIn('id', data)
-        self.assertEqual(data['id'], self.ticket_id)
+        self.assertIn("id", data)
+        self.assertEqual(data["id"], self.ticket_id)
 
     def test_bulk_edit_with_invalid_mechanic_ids(self):
         """Test bulk edit with non-existent mechanic IDs"""
         edit_data = {
             "add_ids": [999, 998],  # Non-existent mechanic IDs
-            "remove_ids": []
+            "remove_ids": [],
         }
 
-        response = self.client.put(f'/service-tickets/{self.ticket_id}/edit',
-                                   json=edit_data)
+        response = self.client.put(
+            f"/service-tickets/{self.ticket_id}/edit", json=edit_data
+        )
 
         # Should still succeed but ignore non-existent IDs
         self.assertEqual(response.status_code, 200)
 
     def test_add_part_to_ticket(self):
         """Test adding an inventory part to a service ticket"""
-        url = f'/service-tickets/{self.ticket_id}/add-part/{self.inventory_id}'
+        url = f"/service-tickets/{self.ticket_id}/add-part/{self.inventory_id}"
 
         response = self.client.put(url)
 
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertIn('message', data)
+        self.assertIn("message", data)
 
     def test_add_nonexistent_part_to_ticket(self):
         """Test adding non-existent part to ticket"""
-        url = f'/service-tickets/{self.ticket_id}/add-part/999'
+        url = f"/service-tickets/{self.ticket_id}/add-part/999"
 
         response = self.client.put(url)
 
@@ -226,7 +234,7 @@ class TestServiceTicketRoutes(BaseTestCase):
 
     def test_add_part_to_nonexistent_ticket(self):
         """Test adding part to non-existent ticket"""
-        url = f'/service-tickets/999/add-part/{self.inventory_id}'
+        url = f"/service-tickets/999/add-part/{self.inventory_id}"
 
         response = self.client.put(url)
 
@@ -234,7 +242,7 @@ class TestServiceTicketRoutes(BaseTestCase):
 
     def test_add_duplicate_part_to_ticket(self):
         """Test adding the same part twice to a ticket"""
-        url = f'/service-tickets/{self.ticket_id}/add-part/{self.inventory_id}'
+        url = f"/service-tickets/{self.ticket_id}/add-part/{self.inventory_id}"
 
         # Add part first time
         response1 = self.client.put(url)
@@ -244,8 +252,8 @@ class TestServiceTicketRoutes(BaseTestCase):
         response2 = self.client.put(url)
         self.assertEqual(response2.status_code, 400)
         data = response2.get_json()
-        self.assertIn('message', data)
+        self.assertIn("message", data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

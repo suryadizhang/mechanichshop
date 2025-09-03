@@ -19,10 +19,10 @@ ALGORITHM = 'HS256'  # Using HS256 algorithm for JWT
 def encode_token(customer_id):
     """
     Create a JWT token for a customer login
-    
+
     Args:
         customer_id (int): The customer's ID from the database
-        
+
     Returns:
         str: JWT token that expires in 24 hours
     """
@@ -38,10 +38,10 @@ def encode_token(customer_id):
 def encode_mechanic_token(mechanic_id):
     """
     Create a JWT token for a mechanic
-    
+
     Args:
         mechanic_id (int): The mechanic's ID
-        
+
     Returns:
         str: JWT token
     """
@@ -57,10 +57,10 @@ def encode_mechanic_token(mechanic_id):
 def decode_token(token):
     """
     Decode a JWT token
-    
+
     Args:
         token (str): JWT token
-        
+
     Returns:
         dict: Decoded payload or None if invalid
     """
@@ -78,7 +78,7 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
-        
+
         # Check for token in Authorization header
         if 'Authorization' in request.headers:
             auth_header = request.headers['Authorization']
@@ -86,23 +86,23 @@ def token_required(f):
                 token = auth_header.split(' ')[1]  # Bearer <token>
             except IndexError:
                 return jsonify({'error': 'Invalid token format'}), 401
-        
+
         if not token:
             return jsonify({'error': 'Token is missing'}), 401
-        
+
         # Decode token
         payload = decode_token(token)
         if not payload:
             return jsonify({'error': 'Invalid token'}), 401
-        
+
         # Check if it's a customer token
         if payload.get('user_type') != 'customer':
             return jsonify({'error': 'Invalid token type'}), 401
-        
+
         # Pass customer_id to the decorated function
         current_customer_id = payload.get('customer_id')
         return f(current_customer_id, *args, **kwargs)
-    
+
     return decorated
 
 
@@ -113,7 +113,7 @@ def mechanic_token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
-        
+
         # Check for token in Authorization header
         if 'Authorization' in request.headers:
             auth_header = request.headers['Authorization']
@@ -121,21 +121,21 @@ def mechanic_token_required(f):
                 token = auth_header.split(' ')[1]  # Bearer <token>
             except IndexError:
                 return jsonify({'error': 'Invalid token format'}), 401
-        
+
         if not token:
             return jsonify({'error': 'Token is missing'}), 401
-        
+
         # Decode token
         payload = decode_token(token)
         if not payload:
             return jsonify({'error': 'Invalid token'}), 401
-        
+
         # Check if it's a mechanic token
         if payload.get('user_type') != 'mechanic':
             return jsonify({'error': 'Invalid token type'}), 401
-        
+
         # Pass mechanic_id to the decorated function
         current_mechanic_id = payload.get('mechanic_id')
         return f(current_mechanic_id, *args, **kwargs)
-    
+
     return decorated

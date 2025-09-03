@@ -5,13 +5,13 @@ from marshmallow import fields, validate
 
 class ServiceTicketSchema(ma.SQLAlchemyAutoSchema):
     """Schema for Service Ticket model serialization and validation"""
-    
+
     class Meta:
         model = ServiceTicket
         load_instance = True
         include_relationships = True
         include_fk = True  # Include foreign keys like customer_id
-    
+
     # Fields to match the actual model
     id = fields.Int(dump_only=True)
     title = fields.Str(required=True, validate=validate.Length(min=1, max=200))

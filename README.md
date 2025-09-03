@@ -283,7 +283,7 @@ POST /customer/login
 ```bash
 POST /mechanic/login
 {
-  "email": "mechanic@example.com", 
+  "email": "mechanic@example.com",
   "password": "password123"
 }
 ```
@@ -358,11 +358,11 @@ class TestCustomerRoutes(BaseTest):
     def test_create_customer_success(self):
         """Test successful customer creation"""
         # Positive test case
-        
+
     def test_create_customer_invalid_email(self):
         """Test customer creation with invalid email"""
         # Negative test case
-        
+
     def test_create_customer_missing_fields(self):
         """Test customer creation with missing required fields"""
         # Edge case testing

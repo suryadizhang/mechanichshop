@@ -26,7 +26,7 @@ inventory_service_ticket = db.Table('inventory_service_ticket',
 
 class Customer(db.Model):
     __tablename__ = 'customers'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -36,27 +36,27 @@ class Customer(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
-    
+
     # Relationships
     service_tickets = db.relationship('ServiceTicket', backref='customer',
                                       lazy=True,
                                       cascade='all, delete-orphan')
-    
+
     def set_password(self, password):
         """Hash and set password"""
         self.password_hash = generate_password_hash(password)
-    
+
     def check_password(self, password):
         """Check password against hash"""
         return check_password_hash(self.password_hash, password)
-    
+
     def __repr__(self):
         return f'<Customer {self.name}>'
 
 
 class Mechanic(db.Model):
     __tablename__ = 'mechanics'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -67,27 +67,27 @@ class Mechanic(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
-    
+
     # Relationships - Many-to-many with service tickets
     service_tickets = db.relationship('ServiceTicket',
                                       secondary=mechanic_service_ticket,
                                       back_populates='mechanics')
-    
+
     def set_password(self, password):
         """Hash and set password"""
         self.password_hash = generate_password_hash(password)
-    
+
     def check_password(self, password):
         """Check password against hash"""
         return check_password_hash(self.password_hash, password)
-    
+
     def __repr__(self):
         return f'<Mechanic {self.name}>'
 
 
 class ServiceTicket(db.Model):
     __tablename__ = 'service_tickets'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
@@ -101,42 +101,42 @@ class ServiceTicket(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
-    
+
     # Relationships
     # Many-to-many with mechanics
     mechanics = db.relationship('Mechanic',
                                 secondary=mechanic_service_ticket,
                                 back_populates='service_tickets')
-    
+
     # Many-to-many with inventory items
     inventory_items = db.relationship('Inventory',
                                       secondary=inventory_service_ticket,
                                       back_populates='service_tickets')
-    
+
     def calculate_total_cost(self):
         """Calculate total cost including labor and parts"""
         total_cost = float(self.estimated_cost or 0)
-        
+
         # Add labor costs from assigned mechanics
         if self.mechanics:
             avg_rate = (sum(mechanic.hourly_rate for mechanic in
                            self.mechanics) / len(self.mechanics))
             # Assuming 2 hours of work - this could be made configurable
             total_cost += float(avg_rate) * 2
-        
+
         # Add parts costs
         for item in self.inventory_items:
             total_cost += float(item.price)
-        
+
         return round(total_cost, 2)
-    
+
     def __repr__(self):
         return f'<ServiceTicket {self.title}>'
 
 
 class Inventory(db.Model):
     __tablename__ = 'inventory'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
@@ -147,11 +147,11 @@ class Inventory(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow,
                            onupdate=datetime.utcnow)
-    
+
     # Relationships
     service_tickets = db.relationship('ServiceTicket',
                                       secondary=inventory_service_ticket,
                                       back_populates='inventory_items')
-    
+
     def __repr__(self):
         return f'<Inventory {self.name}>'

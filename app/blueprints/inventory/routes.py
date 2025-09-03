@@ -1,5 +1,5 @@
 """
-Inventory management routes 
+Inventory management routes
 This was the new requirement - adding parts/inventory tracking
 """
 from flask import request, jsonify
