@@ -99,13 +99,16 @@ def get_mechanic(id):
     return mechanic_schema.jsonify(mechanic), 200
 
 
-@mechanic_bp.route('/', methods=['PUT'])
+@mechanic_bp.route('/<int:id>', methods=['PUT'])
 @mechanic_token_required  # Only authenticated mechanics can update profile
-def update_current_mechanic(current_mechanic_id):
-    """PUT '/': Updates the current authenticated mechanic's profile"""
-    # Mechanics can update their own profile
+def update_mechanic(current_mechanic_id, id):
+    """PUT '/<int:id>': Updates a specific mechanic by ID"""
+    # First check if the mechanic exists (404 if not found)
+    mechanic = Mechanic.query.get_or_404(id)
 
-    mechanic = Mechanic.query.get_or_404(current_mechanic_id)
+    # Then check if the current mechanic is updating their own profile
+    if current_mechanic_id != id:
+        return jsonify({'error': 'Unauthorized to update this mechanic'}), 401
 
     try:
         # Set the instance on the schema for updates
@@ -122,13 +125,17 @@ def update_current_mechanic(current_mechanic_id):
         return jsonify({'error': str(e)}), 400
 
 
-@mechanic_bp.route('/', methods=['DELETE'])
+@mechanic_bp.route('/<int:id>', methods=['DELETE'])
 @mechanic_token_required  # Authentication required for deletes
-def delete_current_mechanic(current_mechanic_id):
-    """DELETE '/': Deletes the current authenticated mechanic's account"""
-    # Mechanics can delete their own account
+def delete_mechanic(current_mechanic_id, id):
+    """DELETE '/<int:id>': Deletes a specific mechanic by ID"""
+    # First check if the mechanic exists (404 if not found)
+    mechanic = Mechanic.query.get_or_404(id)
 
-    mechanic = Mechanic.query.get_or_404(current_mechanic_id)
+    # Then check if the current mechanic is deleting their own account
+    if current_mechanic_id != id:
+        return jsonify({'error': 'Unauthorized to delete this mechanic'}), 401
+
     try:
         db.session.delete(mechanic)
         db.session.commit()
