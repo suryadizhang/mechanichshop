@@ -35,8 +35,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip wheel setuptools
+          # Try normal installation first
+          pip install -r requirements.txt || {
+            echo "Normal installation failed, trying with --force-reinstall"
+            pip install --force-reinstall -r requirements.txt
+          }
           pip install pytest flake8
 
       - name: Lint code
