@@ -15,6 +15,9 @@ config_name = os.environ.get("FLASK_ENV", "development")
 # Create the Flask app using factory pattern
 app = create_app(config_name)
 
+# Expose app for Gunicorn
+application = app
+
 
 @app.shell_context_processor
 def make_shell_context():

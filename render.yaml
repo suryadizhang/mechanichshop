@@ -1,5 +1,9 @@
-# Build Command
-pip install -r requirements.txt
-
-# Start Command
-gunicorn --bind 0.0.0.0:$PORT flask_app:app
+services:
+  - type: web
+    name: mechanic-shop-api
+    env: python
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 30 flask_app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
