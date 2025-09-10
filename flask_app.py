@@ -1,13 +1,17 @@
 ﻿import os
-from dotenv import load_dotenv
 from app import create_app
 from app.extention import db
 from app.models import Customer, Mechanic, ServiceTicket, Inventory
 from flask import jsonify
 from datetime import datetime
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file (only in development)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # python-dotenv not available (production environment)
+    pass
 
 # Get environment from environment variable (defaults to development)
 config_name = os.environ.get("FLASK_ENV", "development")
