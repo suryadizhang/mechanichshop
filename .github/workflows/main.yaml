@@ -71,20 +71,41 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: test-and-build
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Deploy to Render
         run: |
-          echo "🚀 Deploying to Render..."
+          echo "🚀 Deploying to Render after successful tests..."
+          echo "Commit: ${{ github.sha }}"
           echo "Service ID: ${{ secrets.RENDER_SERVICE_ID }}"
-          echo "Triggering deployment via Render API..."
           
-          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+          # Trigger deployment via Render API
+          RESPONSE=$(curl -s -w "%{http_code}" -X POST \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
             -H "Accept: application/json" \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Content-Type: application/json" \
-            -d '{}'
+            -d '{"clearCache": false}')
           
-          echo "✅ Deployment triggered successfully!"
-          echo "Check deployment status at: https://dashboard.render.com"
+          HTTP_CODE="${RESPONSE: -3}"
+          RESPONSE_BODY="${RESPONSE%???}"
+          
+          if [ "$HTTP_CODE" -eq 201 ] || [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✅ Deployment triggered successfully!"
+            echo "Response: $RESPONSE_BODY"
+            echo "Check deployment status at: https://dashboard.render.com/web/${{ secrets.RENDER_SERVICE_ID }}"
+          else
+            echo "❌ Deployment failed with HTTP code: $HTTP_CODE"
+            echo "Response: $RESPONSE_BODY"
+            exit 1
+          fi
+
+      - name: Wait for deployment
+        run: |
+          echo "⏳ Waiting for deployment to complete..."
+          sleep 30
+          echo "🔍 Check your service at: https://mechanichshop.onrender.com"

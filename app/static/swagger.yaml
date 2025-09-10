@@ -3,9 +3,9 @@ info:
   title: "Mechanic Shop API"
   description: "A comprehensive Flask API for managing a mechanic shop with customers, mechanics, service tickets, and inventory. Features JWT authentication, rate limiting, caching, and advanced queries."
   version: "1.0.0"
-host: "127.0.0.1:5000"
+host: "mechanichshop.onrender.com"
 schemes:
-  - "http"
+  - "https"
 consumes:
   - "application/json"
 produces:
