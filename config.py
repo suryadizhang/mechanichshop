@@ -34,7 +34,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = (
         os.environ.get('DEV_DATABASE_URL') or
-        'mysql+pymysql://root:13Agustus@localhost/mechanicshop'
+        'sqlite:///mechanic_shop.db'  # Use SQLite for development
     )
 
 

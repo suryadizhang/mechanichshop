@@ -13,8 +13,12 @@ except ImportError:
     # python-dotenv not available (production environment)
     pass
 
-# Get environment from environment variable (defaults to development)
-config_name = os.environ.get("FLASK_ENV", "development")
+# Get environment from environment variable
+# If DATABASE_URL is set (like in Render), use production config
+if os.environ.get("DATABASE_URL"):
+    config_name = "production"
+else:
+    config_name = os.environ.get("FLASK_ENV", "development")
 
 # Create the Flask app using factory pattern
 app = create_app(config_name)
