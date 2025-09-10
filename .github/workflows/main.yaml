@@ -83,7 +83,7 @@ jobs:
           echo "Commit: ${{ github.sha }}"
           echo "Service ID: ${{ secrets.RENDER_SERVICE_ID }}"
           
-          # Simple deployment trigger without JSON body
+          # Trigger deployment via Render API
           HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" -X POST \
             "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
             -H "Accept: application/json" \
@@ -93,28 +93,15 @@ jobs:
           echo "Response Body:"
           cat response.json || echo "No response body"
           
-          if [ "$HTTP_CODE" -eq 201 ] || [ "$HTTP_CODE" -eq 200 ]; then
+          # HTTP 200=OK, 201=Created, 202=Accepted (all success codes for this API)
+          if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 201 ] || [ "$HTTP_CODE" -eq 202 ]; then
             echo "✅ Deployment triggered successfully!"
-            echo "Check deployment status at: https://dashboard.render.com/web/${{ secrets.RENDER_SERVICE_ID }}"
+            echo "🔗 Monitor deployment: https://dashboard.render.com/web/${{ secrets.RENDER_SERVICE_ID }}"
+            echo "🌐 Live API: https://mechanichshop.onrender.com"
           else
             echo "❌ Deployment failed with HTTP code: $HTTP_CODE"
-            
-            # Try alternative approach with empty JSON body
-            echo "Trying alternative deployment method..."
-            HTTP_CODE2=$(curl -s -o response2.json -w "%{http_code}" -X POST \
-              "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
-              -H "Accept: application/json" \
-              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-              -H "Content-Type: application/json" \
-              -d '{}')
-            
-            echo "Alternative HTTP Status Code: $HTTP_CODE2"
-            if [ "$HTTP_CODE2" -eq 201 ] || [ "$HTTP_CODE2" -eq 200 ]; then
-              echo "✅ Alternative deployment method succeeded!"
-            else
-              echo "❌ Both deployment methods failed"
-              exit 1
-            fi
+            echo "Check Render API documentation or service status"
+            exit 1
           fi
 
       - name: Wait for deployment
