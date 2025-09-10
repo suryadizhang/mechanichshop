@@ -41,10 +41,13 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     """Production environment configuration"""
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = (
-        os.environ.get('DATABASE_URL') or
-        'mysql+pymysql://root:13Agustus@localhost/mechanicshop'
-    )
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    
+    # Security settings for production
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_recycle': 300,
+        'pool_pre_ping': True
+    }
 
 
 class TestingConfig(Config):

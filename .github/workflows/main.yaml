@@ -74,7 +74,17 @@ jobs:
     if: github.ref == 'refs/heads/master'
 
     steps:
-      - name: Deploy to production
+      - name: Deploy to Render
         run: |
-          echo "🚀 Deploying to production..."
-          echo "Commit: ${{ github.sha }}"
+          echo "🚀 Deploying to Render..."
+          echo "Service ID: ${{ secrets.RENDER_SERVICE_ID }}"
+          echo "Triggering deployment via Render API..."
+          
+          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+          
+          echo "✅ Deployment triggered successfully!"
+          echo "Check deployment status at: https://dashboard.render.com"

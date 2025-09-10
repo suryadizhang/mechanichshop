@@ -1,9 +1,13 @@
 ﻿import os
+from dotenv import load_dotenv
 from app import create_app
 from app.extention import db
 from app.models import Customer, Mechanic, ServiceTicket, Inventory
 from flask import jsonify
 from datetime import datetime
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Get environment from environment variable (defaults to development)
 config_name = os.environ.get("FLASK_ENV", "development")
@@ -91,5 +95,6 @@ if __name__ == "__main__":
         db.create_all()
         print("Database tables created!")
 
-    # Run the development server
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    # Run the development server only in development
+    if config_name == "development":
+        app.run(debug=True, host="0.0.0.0", port=5000)
